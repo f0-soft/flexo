@@ -1,0 +1,32 @@
+{
+	"name": "f0.flexo",
+	"version": "0.0.1",
+	"description": "ModelView provider",
+	"license": "BSD",
+	"author": {
+		"name": "Vitaliy glukki Meschaninov",
+		"email": "vm@f0-soft.ru",
+		"url": "http://f0-soft.ru"
+	},
+
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/f0-soft/flexo.git"
+	},
+	"bugs": {
+		"url": "https://github.com/f0-soft/flexo/issues"
+	},
+
+	"main": "index.js",
+	"scripts": {
+		"test": "nodeunit test"
+	},
+
+	"dependencies": {
+		"async": "",
+		"validator": ""
+	},
+	"devDependencies": {
+	}
+}

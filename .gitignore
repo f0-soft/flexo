@@ -1,0 +1,78 @@
+###Node###
+
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+
+# Node custom
+files
+node_modules
+
+
+###Linux###
+
+.*
+!.gitignore
+*~
+
+# KDE
+.directory
+
+
+###Windows###
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+
+###OSX###
+
+.DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+
+###SublimeText###
+
+# SublimeText project files
+/*.sublime-project
+*.sublime-workspace
+sftp-config*.json
+
+# Tern project files
+/.tern-project
+/.tern-port
+
+
+###KomodoEdit###
+
+*.komodoproject
+
+
+###IntelliJ###
+*.iml
+*.ipr
+*.iws
+.idea/
