@@ -25,10 +25,9 @@
 
 	"dependencies": {
 		"async": "",
-		"validator": "",
-		"f0.collectioner": "git+ssh://git@github.com:f0-soft/collectioner.git",
-		"f0.rabbit": "git+ssh://git@github.com:f0-soft/rabbit.git"
+		"validator": ""
 	},
 	"devDependencies": {
+		"f0.rabbit": "git+ssh://git@github.com:f0-soft/rabbit.git"
 	}
 }
