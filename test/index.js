@@ -6,6 +6,9 @@
  Перед запуском с настоящим `rabbit` следует очистить коллекции `test` и `test_join` 
  Для тестов с настоящим `rabbit`, надо ниже в переменной `flexoConfig` заменить значение mock на `false`
  Тест запускать через `node test/index.js`
+ 
+ Очистка mongo и redis: 
+ mongo --eval 'db.test.remove(); db.test_join.remove();' && redis-cli FLUSHALL
  */
 
 var mock = true;
@@ -81,14 +84,19 @@ var tasks = {
 		var storage;
 		console.log( 'Init storage' );
 
-		storage = mock ? require( '../mock/storage' ) : require( 'rabbit' );
+		storage = mock ? require( '../mock/storage' ) : require( 'f0.rabbit' );
 		storage.init( {}, function( error, result ) {
 			if ( error ) {
 				callback( error );
 				return;
 			}
 
-			flexoConfig.storage = result;
+			flexoConfig.storage = {
+				find: storage.find,
+				insert: storage.insert,
+				modify: storage.modify,
+				delete: storage.delete
+			};
 			callback( null, result );
 		} );
 	},
@@ -118,8 +126,14 @@ var tasks = {
 				return;
 			}
 
-			if ( data.length !== 0 ) { throw new Error( 'Empty DB before test' ); }
-			if ( count !== 0 ) { throw new Error( 'Returned count is not equal 0' ); }
+			if ( data.length !== 0 ) {
+				callback( new Error( 'Empty DB before test' ) );
+				return;
+			}
+			if ( count !== 0 ) {
+				callback( new Error( 'Returned count is not equal 0' ) );
+				return;
+			}
 
 			callback( null, { data: data, count: count } );
 		} );
@@ -134,8 +148,14 @@ var tasks = {
 				return;
 			}
 
-			if ( data.length !== 0 ) { throw new Error( 'Empty DB before test' ); }
-			if ( count !== 0 ) { throw new Error( 'Returned count is not equal 0' ); }
+			if ( data.length !== 0 ) {
+				callback( new Error( 'Empty DB before test' ) );
+				return;
+			}
+			if ( count !== 0 ) {
+				callback( new Error( 'Returned count is not equal 0' ) );
+				return;
+			}
 
 			callback( null, { data: data, count: count } );
 		} );

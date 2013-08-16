@@ -188,5 +188,9 @@ Storage.delete = function( collection, query, callback ) {
 
 module.exports = {
 	init: function( options, callback ) { callback( null, Storage ); },
-	status: function() { return 'conneted'; }
+	status: function() { return 'conneted'; },
+	find: Storage.find,
+	insert: Storage.insert,
+	modify: Storage.modify,
+	delete: Storage.delete
 };
