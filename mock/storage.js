@@ -30,7 +30,7 @@ Storage = {};
 //     count
 // }
 Storage.find = function( collection, query, options, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
+	var timeout = parseInt( Math.random() * 10, 10 );
 	var ids, i, j;
 	var res = [];
 
@@ -73,7 +73,7 @@ Storage.find = function( collection, query, options, callback ) {
 // Сохраняет документы как новые
 // Возвращает ОК, иначе несохраненные документы
 Storage.insert = function( collection, docs, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
+	var timeout = parseInt( Math.random() * 10, 10 );
 
 	Container[collection] = Container[collection] || [];
 
@@ -123,7 +123,7 @@ Storage.insert = function( collection, docs, callback ) {
 // }
 Storage.modify = function( collection, query, callback ) {
 	// для каждого документа выполняет mongo.findAndModify( request.selector, {_id: 1}, request.properties)
-	var timeout = parseInt( Math.random() * 100, 10 );
+	var timeout = parseInt( Math.random() * 10, 10 );
 
 	Container[collection] = Container[collection] || [];
 
@@ -159,7 +159,7 @@ Storage.modify = function( collection, query, callback ) {
 // Удаляет все документы соответствующие запросу
 // Возвращает массив _id удаленных документов или количество удаленных документов, иначе ошибку
 Storage.delete = function( collection, query, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
+	var timeout = parseInt( Math.random() * 10, 10 );
 
 	Container[collection] = Container[collection] || [];
 
