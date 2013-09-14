@@ -29,18 +29,20 @@ Storage = {};
 //     fields: [],
 //     count
 // }
-Storage.find = function( collection, query, options, callback ) {
+Storage.find = function( args, callback ) {
 	var timeout = parseInt( Math.random() * 10, 10 );
-	var ids, i, j;
+	var pos, ids, i, j;
 	var res = [];
 
-	Container[collection] = Container[collection] || [];
+	Container[args[0]] = Container[args[0]] || [];
 
-	if ( query && query.query && query.query.selector && query.query.selector._id !== undefined ) {
-		if ( typeof query.query.selector._id === 'object' ) {
-			ids = query.query.selector._id.$in;
+	if ( (args[1].indexOf( '_id' ) % 2) === 0 ) {
+		pos = args[1].indexOf( '_id' );
+
+		if ( Array.isArray( args[1][pos + 1] ) ) {
+			ids = args[1][pos + 1].slice( 1 );
 		} else {
-			ids = query.query.selector._id;
+			ids = [ args[1][pos + 1] ];
 		}
 
 		i = 0;
@@ -54,19 +56,19 @@ Storage.find = function( collection, query, options, callback ) {
 		}
 
 		for ( j = 0; j < ids.length; j += 1 ) {
-			for ( i = 0; i < Container[collection].length; i += 1 ) {
-				if ( Container[collection][i]._id === ids[j] ) {
-					res.push( Container[collection][i] );
+			for ( i = 0; i < Container[args[0]].length; i += 1 ) {
+				if ( Container[args[0]][i]._id === ids[j] ) {
+					res.push( Container[args[0]][i] );
 					break;
 				}
 			}
 		}
 	} else {
-		res = Container[collection];
+		res = Container[args[0]];
 	}
 
 	setTimeout( function() {
-		callback( null, res, (options.count ? res.length : undefined) );
+		callback( null, res, ((args[3] && args[3][3]) ? res.length : undefined) );
 	}, timeout );
 };
 

@@ -125,7 +125,7 @@ module.exports = {
 	'Check `test` is empty': function( t ) {
 		t.expect( 4 );
 
-		flexo.find( flexo_1.scheme, flexo_1.fields, { selector: {}, options: {} }, {count: true}, function( err, data, count ) {
+		flexo.find( flexo_1.scheme, flexo_1.fields, { selector: [], options: {} }, {count: true}, function( err, data, count ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -139,7 +139,7 @@ module.exports = {
 	'Check `test_join` is empty': function( t ) {
 		t.expect( 4 );
 
-		flexo.find( flexo_2.scheme, flexo_2.fields, { selector: {} }, {count: true}, function( err, data, count ) {
+		flexo.find( flexo_2.scheme, flexo_2.fields, { selector: [] }, {count: true}, function( err, data, count ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -182,14 +182,14 @@ module.exports = {
 	},
 
 	'Find insertions into `test_join`': function( t ) {
-		var i, ids = [];
+		var i, ids = [ '$in' ];
 		t.expect( 4 );
 
 		for ( i = 0; i < f2_ins.length; i += 1 ) {
 			ids.push( f2_ins[i]._id );
 		}
 
-		flexo.find( flexo_2.scheme, flexo_2.fields, {selector: {_id: {$in: ids}}}, {count: true}, function( err, data, count ) {
+		flexo.find( flexo_2.scheme, flexo_2.fields, {selector: ['_id', ids]}, {count: true}, function( err, data, count ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -232,14 +232,14 @@ module.exports = {
 	},
 
 	'Find insertions into `test`': function( t ) {
-		var i, ids = [];
+		var i, ids = [ '$in' ];
 		t.expect( 4 );
 
 		for ( i = 0; i < f1_ins.length; i += 1 ) {
 			ids.push( f1_ins[i]._id );
 		}
 
-		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: {_id: {$in: ids}}}, {count: true}, function( err, data, count ) {
+		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: ['_id', ids]}, {count: true}, function( err, data, count ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -268,7 +268,7 @@ module.exports = {
 	'Check `test` document modification': function( t ) {
 		t.expect( 8 );
 
-		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: {_id: f1_ins[0]._id}}, {}, function( err, data ) {
+		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: ['_id', f1_ins[0]._id]}, {}, function( err, data ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -304,7 +304,7 @@ module.exports = {
 	'Check `test` document deletion': function( t ) {
 		t.expect( 9 );
 
-		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: {}}, {count: true, all: true}, function( err, data, count ) {
+		flexo.find( flexo_1.scheme, flexo_1.fields, {selector: []}, {count: true, all: true}, function( err, data, count ) {
 			t.ifError( err );
 
 			t.deepEqual( count, 2, 'Excessive documents in `test`' );
