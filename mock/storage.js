@@ -1,6 +1,7 @@
 'use strict';
 
-var log = process.env.DEBUG ? console.log : function() {};
+var log = function() {};
+if ( process.env.DEBUG ) { log = console.log;}
 
 var Container = {};
 var Counter = 0;
@@ -10,6 +11,8 @@ var Storage = function( scheme, fields ) {
 	Container[scheme] = Container[scheme] || [];
 	this.scheme = scheme;
 };
+
+Storage = {};
 
 // Производит поиск документов соответствующих запросу
 // Возвращает количество подходящих документов или документы, иначе ошибку
@@ -26,17 +29,20 @@ var Storage = function( scheme, fields ) {
 //     fields: [],
 //     count
 // }
-Storage.prototype.find = function( request, count, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
-	var scheme = this.scheme;
-	var ids, i, j;
+Storage.find = function( args, callback ) {
+	var timeout = parseInt( Math.random() * 10, 10 );
+	var pos, ids, i, j;
 	var res = [];
 
-	if ( request && request.query && request.query.selector && request.query.selector._id !== undefined ) {
-		if ( typeof request.query.selector._id === 'object' ) {
-			ids = request.query.selector._id.$in;
+	Container[args[0]] = Container[args[0]] || [];
+
+	if ( (args[1].indexOf( '_id' ) % 2) === 0 ) {
+		pos = args[1].indexOf( '_id' );
+
+		if ( Array.isArray( args[1][pos + 1] ) ) {
+			ids = args[1][pos + 1].slice( 1 );
 		} else {
-			ids = request.query.selector._id;
+			ids = [ args[1][pos + 1] ];
 		}
 
 		i = 0;
@@ -50,50 +56,51 @@ Storage.prototype.find = function( request, count, callback ) {
 		}
 
 		for ( j = 0; j < ids.length; j += 1 ) {
-			for ( i = 0; i < Container[scheme].length; i += 1 ) {
-				if ( Container[scheme][i]._id === ids[j] ) {
-					res.push( Container[scheme][i] );
+			for ( i = 0; i < Container[args[0]].length; i += 1 ) {
+				if ( Container[args[0]][i]._id === ids[j] ) {
+					res.push( Container[args[0]][i] );
 					break;
 				}
 			}
 		}
 	} else {
-		res = Container[scheme];
+		res = Container[args[0]];
 	}
 
 	setTimeout( function() {
-		callback( null, res, (count ? res.length : undefined) );
+		callback( null, res, ((args[3] && args[3][3]) ? res.length : undefined) );
 	}, timeout );
 };
 
 // Сохраняет документы как новые
 // Возвращает ОК, иначе несохраненные документы
-Storage.prototype.insert = function( docs, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
-	var scheme = this.scheme;
+Storage.insert = function( collection, docs, callback ) {
+	var timeout = parseInt( Math.random() * 10, 10 );
+
+	Container[collection] = Container[collection] || [];
 
 	setTimeout( function() {
 		var i, j, k, keys;
 		var now = Date.now();
 		var res = [];
 
-		for ( i = 0, j = Container[scheme].length; i < docs.length; i += 1, j += 1, Counter += 1 ) {
-			Container[scheme][j] = {};
+		for ( i = 0, j = Container[collection].length; i < docs.length; i += 1, j += 1, Counter += 1 ) {
+			Container[collection][j] = {};
 
 			keys = Object.keys( docs[i] );
 			for ( k = 0; k < keys.length; k += 1 ) {
-				if ( Array.isArray( Container[scheme][j][keys[k]] ) ) {
-					Container[scheme][j][keys[k]] = docs[i][keys[k]].concat();
+				if ( Array.isArray( Container[collection][j][keys[k]] ) ) {
+					Container[collection][j][keys[k]] = docs[i][keys[k]].concat();
 				} else {
-					Container[scheme][j][keys[k]] = docs[i][keys[k]];
+					Container[collection][j][keys[k]] = docs[i][keys[k]];
 				}
 			}
 
-			Container[scheme][j]._id = Counter.toString( 36 );
-			Container[scheme][j].tsCreate = now;
-			Container[scheme][j].tsUpdate = now;
+			Container[collection][j]._id = Counter.toString( 36 );
+			Container[collection][j].tsCreate = now;
+			Container[collection][j].tsUpdate = now;
 
-			res.push( Container[scheme][j] );
+			res.push( Container[collection][j] );
 		}
 
 		callback( null, res );
@@ -116,10 +123,11 @@ Storage.prototype.insert = function( docs, callback ) {
 //     fields: [],
 //     count
 // }
-Storage.prototype.modify = function( query, callback ) {
+Storage.modify = function( collection, query, callback ) {
 	// для каждого документа выполняет mongo.findAndModify( request.selector, {_id: 1}, request.properties)
-	var timeout = parseInt( Math.random() * 100, 10 );
-	var scheme = this.scheme;
+	var timeout = parseInt( Math.random() * 10, 10 );
+
+	Container[collection] = Container[collection] || [];
 
 	setTimeout( function() {
 		var i, j, k, keys;
@@ -127,19 +135,19 @@ Storage.prototype.modify = function( query, callback ) {
 		var out = [];
 
 		for ( i = 0; i < query.length; i += 1 ) {
-			for ( j = 0; j < Container[scheme].length; j += 1 ) {
-				if ( Container[scheme][j]._id === query[i].selector._id ) {
+			for ( j = 0; j < Container[collection].length; j += 1 ) {
+				if ( Container[collection][j]._id === query[i].selector._id ) {
 					keys = Object.keys( query[i].properties );
 					for ( k = 0; k < keys.length; k += 1 ) {
 						if ( Array.isArray( query[i].properties[keys[k]] ) ) {
-							Container[scheme][j][keys[k]] = query[i].properties[keys[k]].concat();
+							Container[collection][j][keys[k]] = query[i].properties[keys[k]].concat();
 						} else {
-							Container[scheme][j][keys[k]] = query[i].properties[keys[k]];
+							Container[collection][j][keys[k]] = query[i].properties[keys[k]];
 						}
 					}
-					Container[scheme][j].tsUpdate = now;
+					Container[collection][j].tsUpdate = now;
 
-					out.push( {_id: Container[scheme][j]._id, tsUpdate: now} );
+					out.push( {_id: Container[collection][j]._id, tsUpdate: now} );
 
 					break;
 				}
@@ -152,21 +160,22 @@ Storage.prototype.modify = function( query, callback ) {
 
 // Удаляет все документы соответствующие запросу
 // Возвращает массив _id удаленных документов или количество удаленных документов, иначе ошибку
-Storage.prototype.delete = function( query, callback ) {
-	var timeout = parseInt( Math.random() * 100, 10 );
-	var scheme = this.scheme;
+Storage.delete = function( collection, query, callback ) {
+	var timeout = parseInt( Math.random() * 10, 10 );
+
+	Container[collection] = Container[collection] || [];
 
 	setTimeout( function() {
 		var i, j;
 		var out = [];
 
 		for ( i = 0; i < query.length; i += 1 ) {
-			for ( j = 0; j < Container[scheme].length; j += 1 ) {
-				if ( Container[scheme][j]._id === query[i].selector._id ) {
+			for ( j = 0; j < Container[collection].length; j += 1 ) {
+				if ( Container[collection][j]._id === query[i].selector._id ) {
 
-					out.push( {_id: Container[scheme][j]._id} );
+					out.push( {_id: Container[collection][j]._id} );
 
-					Container[scheme].splice( j, 1 );
+					Container[collection].splice( j, 1 );
 
 					break;
 				}
@@ -180,7 +189,10 @@ Storage.prototype.delete = function( query, callback ) {
 
 
 module.exports = {
-	New: Storage,
-	init: function( options, callback ) { callback(); },
-	status: function() { return 'conneted'; }
+	init: function( options, callback ) { callback( null, Storage ); },
+	status: function() { return 'conneted'; },
+	find: Storage.find,
+	insert: Storage.insert,
+	modify: Storage.modify,
+	delete: Storage.delete
 };

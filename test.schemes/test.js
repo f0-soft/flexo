@@ -16,7 +16,7 @@ module.exports = {
 		inn: { type: 'string' },
 		comment: { type: 'string' },
 		join_id: { type: 'id' }, // автоматически обязательное поле из-за джойна
-		array_of_id: { type: 'array', of: 'id', scheme: 'test_join' } // может быть пустым
+		array_of_id: { type: 'array', of: 'id', from: 'test_join', inline: 'array_of_id' } // может быть пустым
 	},
 
 
@@ -24,6 +24,7 @@ module.exports = {
 	// содержат неизменяемые поля
 	join: {
 		test_join: { // название схемы, становится префиксом
+			rename: 'tj',
 			fields: [ 'name', 'inn', 'comment' ], // `_id` добавляется автоматически
 			depend: [ 'root', 'join_id' ] // связь через _id: название группы/корень, название поля группы/корня
 		}

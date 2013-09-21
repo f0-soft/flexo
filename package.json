@@ -1,6 +1,6 @@
 {
 	"name": "f0.flexo",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "ModelView provider",
 	"license": "BSD",
 	"author": {
@@ -26,9 +26,9 @@
 	"dependencies": {
 		"async": "",
 		"validator": "",
-		"f0.collectioner": "git+ssh://git@github.com:f0-soft/collectioner.git",
-		"f0.rabbit": "git+ssh://git@github.com:f0-soft/rabbit.git"
+		"f0.argstype": "git+ssh://git@github.com:f0-soft/argstype.git"
 	},
 	"devDependencies": {
+		"f0.rabbit": "git+ssh://git@github.com:f0-soft/rabbit.git"
 	}
 }
