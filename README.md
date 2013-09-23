@@ -124,6 +124,43 @@ var schemes = {
 	* ```documents``` - массив, содержит объекты документов
 	* ```count``` - число, общее количество удовлетворяющих запросу документов
 
+	
+	
+### collection.aggregate( scheme, match, group, callback )
+Производит аггреацию, вызывает аггрегацию Rabbit.
+ 
+Параметры:
+* ```scheme``` - строка, содержит название схемы
+* ```match``` - объект, содержит селектор поиска
+* ```group``` - объект, содержит правила группировки
+* ```callback( error, documents )``` - строка, содержит название схемы
+* ```documents``` - массив, содержит объекты результатов группировки
+    
+Запрос к rabbit.aggregate( request, callback )
+Параметры:
+* ```request``` - массив
+    * ```collection_name``` - название коллекции
+    * ```match``` - массив, содержит монговский поисковый запрос-массив как в rabbit.find
+    * ```group``` - объект, содержит правила группировки
+* ```callback( error, data )``` - функция
+    * ```data``` - массив, может содержать ноль и более объектов
+    
+Пример работы rabbit.aggregate
+```
+rabbit.aggregate = function( request, callback ){
+    var coll = request[0];
+    var match = request[1];
+    var group = request[2];
+    
+    var new_match = objectSelectorFromArraySelector( match );
+    
+    COLLECTIONS[ coll ].aggregate( [
+        { $match: new_match },
+        { $group: group }
+    ], callback );
+}
+```
+
 
 
 ### collection.insert( scheme, fields, document, options, callback )
