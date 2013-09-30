@@ -126,40 +126,21 @@ var schemes = {
 
 	
 	
-### collection.aggregate( scheme, match, group, callback )
+### collection.aggregate( scheme, pipeline, callback )
 Производит аггреацию, вызывает аггрегацию Rabbit.
  
 Параметры:
 * ```scheme``` - строка, содержит название схемы
-* ```match``` - объект, содержит селектор поиска
-* ```group``` - объект, содержит правила группировки
+* ```pipeline``` - массив, содержит последовательность агрегации в естественном виде
 * ```callback( error, documents )``` - строка, содержит название схемы
-* ```documents``` - массив, содержит объекты результатов группировки
+    * ```documents``` - массив, содержит результаты агрегации
     
-Запрос к rabbit.aggregate( request, callback )
-Параметры:
+Запрос к rabbit.aggregate( request, callback ):
 * ```request``` - массив
-    * ```collection_name``` - название коллекции
-    * ```match``` - массив, содержит монговский поисковый запрос-массив как в rabbit.find
-    * ```group``` - объект, содержит правила группировки
+    * ```collection_name``` - строка, название коллекции
+    * ```pipeline``` - массив, содержит последовательность агрегации в естественном виде
 * ```callback( error, data )``` - функция
-    * ```data``` - массив, может содержать ноль и более объектов
-    
-Пример работы rabbit.aggregate
-```
-rabbit.aggregate = function( request, callback ){
-    var coll = request[0];
-    var match = request[1];
-    var group = request[2];
-    
-    var new_match = objectSelectorFromArraySelector( match );
-    
-    COLLECTIONS[ coll ].aggregate( [
-        { $match: new_match },
-        { $group: group }
-    ], callback );
-}
-```
+    * ```data``` - массив, содержит результаты агрегации
 
 
 
