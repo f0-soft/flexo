@@ -31,9 +31,36 @@ module.exports = {
 	},
 
 
-	// серверные вычисляемые поля
-	calc: {
+
+	before: {
+		insert: [
+			function( name, docs, callback ) {
+				console.log( 'before insert' );
+				return callback( null, true );
+			}
+		],
+		modify: [
+			function( name, query, callback ) {
+				console.log( 'before modify' );
+				return callback( null, true );
+			}
+		]
 	},
+	after: { // может содержать только `insert`, `modify`
+		insert: [ // функции в массиве запускаются параллельно
+			function( name, docs, callback ) { // каждая функция в `this` имеет объект с функциями flexo
+				console.log( 'after insert' );
+				return callback( null, true );
+			}
+		],
+		modify: [
+			function( name, query, callback ) {
+				console.log( 'after modify' );
+				return callback( null, true );
+			}
+		]
+	},
+
 
 
 	// уникальные значения
