@@ -14,7 +14,7 @@
  */
 
 var mock;
-//mock = true;
+mock = true;
 
 //process.env.DEBUG = true;
 var log = function() { return arguments.length; };
