@@ -9,40 +9,26 @@ module.exports = {
 
 	before: {
 		insert: [
-			function( name, docs, callback ) {
+			function( callback ) {
 				return callback( null );
 			}
 		],
 		modify: [
-			function( name, query, callback ) {
+			function( callback ) {
 				return callback( null );
 			}
 		]
 	},
 	after: { // может содержать только `find`, `insert`, `modify`, delete`
 		insert: [ // функции в массиве запускаются параллельно
-			function( name, docs, callback ) { // каждая функция в `this` имеет объект с функциями flexo
+			function( callback ) { // каждая функция в `this` имеет объект с функциями flexo
 				return callback( null );
 			}
 		],
 		modify: [
-			function( name, query, callback ) {
+			function( callback ) {
 				return callback( null );
 			}
 		]
 	}
-};
-
-var document = {
-	_id: '6',
-	date: 123,
-	attachment_id: [ '4', '5' ],
-	_path: [
-		{ c: 'testAttachment', k: 'attachment_id', i: '4', o: '3' },
-		{ c: 'testAttachment', k: 'attachment_id', i: '5', o: '3' },
-
-		{ c: 'testContract', k: 'attachment_id', i: '3', o: '2' },
-
-		{ c: 'testCustomer', k: 'attachment_id', i: '2', o: '1' }
-	]
 };
