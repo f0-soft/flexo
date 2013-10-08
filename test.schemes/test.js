@@ -34,13 +34,13 @@ module.exports = {
 
 	before: {
 		insert: [
-			function( name, docs, callback ) {
+			function( callback ) {
 				console.log( 'before insert' );
 				return callback( null, true );
 			}
 		],
 		modify: [
-			function( name, query, callback ) {
+			function( callback ) {
 				console.log( 'before modify' );
 				return callback( null, true );
 			}
@@ -48,13 +48,13 @@ module.exports = {
 	},
 	after: { // может содержать только `insert`, `modify`
 		insert: [ // функции в массиве запускаются параллельно
-			function( name, docs, callback ) { // каждая функция в `this` имеет объект с функциями flexo
+			function( callback ) { // каждая функция в `this` имеет объект с функциями flexo
 				console.log( 'after insert' );
 				return callback( null, true );
 			}
 		],
 		modify: [
-			function( name, query, callback ) {
+			function( callback ) {
 				console.log( 'after modify' );
 				return callback( null, true );
 			}

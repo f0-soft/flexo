@@ -29,47 +29,41 @@ Storage = {};
 //     fields: [],
 //     count
 // }
-Storage.find = function( args, callback ) {
+Storage.find = function( query, callback ) {
 	var timeout = parseInt( Math.random() * 10, 10 );
-	var pos, ids, i, j;
+	var ids, ids_out, i, j;
 	var res = [];
 
-	Container[args[0]] = Container[args[0]] || [];
+	Container[query.collname] = Container[query.collname] || [];
 
-	if ( (args[1].indexOf( '_id' ) % 2) === 0 ) {
-		pos = args[1].indexOf( '_id' );
+	if ( query.selector._id !== undefined ) {
 
-		if ( Array.isArray( args[1][pos + 1] ) ) {
-			ids = args[1][pos + 1].slice( 1 );
+		if ( Array.isArray( query.selector._id ) ) {
+			ids = query.selector._id;
 		} else {
-			ids = [ args[1][pos + 1] ];
+			ids = [ query.selector._id ];
 		}
 
-		i = 0;
-		while ( i <= ids.length ) {
-			j = ids.indexOf( ids[i], i + 1 );
-			while ( j !== -1 ) {
-				ids.splice( j, 1 );
-				j = ids.indexOf( ids[i], i + 1 );
+		ids_out = [];
+		for ( i = 0; i < ids.length; i += 1 ) {
+			if ( ids_out.indexOf( ids[i] ) === -1 ) {
+				ids_out.push( ids[i] );
 			}
-			i += 1;
 		}
 
-		for ( j = 0; j < ids.length; j += 1 ) {
-			for ( i = 0; i < Container[args[0]].length; i += 1 ) {
-				if ( Container[args[0]][i]._id === ids[j] ) {
-					res.push( Container[args[0]][i] );
+		for ( j = 0; j < ids_out.length; j += 1 ) {
+			for ( i = 0; i < Container[query.collname].length; i += 1 ) {
+				if ( Container[query.collname][i]._id === ids_out[j] ) {
+					res.push( Container[query.collname][i] );
 					break;
 				}
 			}
 		}
 	} else {
-		res = Container[args[0]];
+		res = Container[query.collname];
 	}
 
-	setTimeout( function() {
-		callback( null, res, ((args[3] && args[3][3]) ? res.length : undefined) );
-	}, timeout );
+	return setTimeout( callback.bind( null, null, {result: res, count: ( (query.options && query.options.count) ? res.length : undefined )} ), timeout );
 };
 
 // Сохраняет документы как новые
@@ -171,7 +165,7 @@ Storage.delete = function( collection, query, callback ) {
 
 		for ( i = 0; i < query.length; i += 1 ) {
 			for ( j = 0; j < Container[collection].length; j += 1 ) {
-				if ( Container[collection][j]._id === query[i].selector._id ) {
+				if ( Container[collection][j]._id === query[i]._id ) {
 
 					out.push( {_id: Container[collection][j]._id} );
 
