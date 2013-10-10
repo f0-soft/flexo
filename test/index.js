@@ -27,10 +27,15 @@ var Flexo = require( '../' );
 
 var storageConfig = {
 	gPrefixCol: {
-		test: 'tt',
-		test_join: 'tj'
-	}
-};
+		c2p: {
+			test: 'tt',
+			test_join: 'tj'
+		},
+		p2c: {
+			tt: 'test',
+			tj: 'test_join'
+		}
+	}};
 var flexo, flexoConfig = {
 	storage: undefined,
 	schemes: {
@@ -150,7 +155,7 @@ module.exports = {
 	'Check `test_join` is empty': function( t ) {
 		t.expect( 8 );
 
-		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {}, options: {count: true}}, function( err, data, count ) {
+		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {}, options: {count: true}}, function( err, data ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -206,7 +211,7 @@ module.exports = {
 			ids.push( f2_ins[i]._id );
 		}
 
-		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data, count ) {
+		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -265,7 +270,7 @@ module.exports = {
 			ids.push( f1_ins[i]._id );
 		}
 
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data, count ) {
+		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
 			t.ifError( err );
 
 			t.ok( data, 'No data returned' );
@@ -338,7 +343,7 @@ module.exports = {
 	'Check `test` document deletion': function( t ) {
 		t.expect( 13 );
 
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data, count ) {
+		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
 			t.ifError( err );
 
 			t.ok( data );
