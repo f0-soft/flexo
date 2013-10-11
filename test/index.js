@@ -14,7 +14,7 @@
  */
 
 var mock;
-mock = true;
+//mock = true;
 
 //process.env.DEBUG = true;
 var log = function() { return arguments.length; };
@@ -178,7 +178,7 @@ module.exports = {
 		flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, documents: [
 			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: [rnd(), rnd(), rnd()]},
 			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: [rnd(), rnd()]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: [rnd()]}
+			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: rnd() }
 		], options: {}}, function( err, data ) {
 			t.ifError( err );
 
