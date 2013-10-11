@@ -55,7 +55,7 @@ var flexo, flexoConfig = {
 					inn: { type: 'string' },
 					comment: { type: 'string' },
 					join_id: { type: 'id' },
-					array_of_id: { type: 'array', of: 'id', scheme: 'test_join' },
+					array_of_id: { type: 'array', of: 'id', from: 'test_join' },
 					test_join__id: {type: 'id'},
 					test_join_name: { type: 'string' },
 					test_join_inn: { type: 'string' },
@@ -78,7 +78,7 @@ var flexo, flexoConfig = {
 					name: { type: 'string' },
 					inn: { type: 'string' },
 					comment: { type: 'string' },
-					array_of_id: { type: 'array', of: 'id', scheme: 'test_join' }
+					array_of_id: { type: 'array', of: 'id', from: 'test_join' }
 				}
 			}
 		}
