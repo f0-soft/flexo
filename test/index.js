@@ -14,7 +14,7 @@
  */
 
 var mock;
-//mock = true;
+mock = true;
 
 //process.env.DEBUG = true;
 var log = function() { return arguments.length; };
@@ -49,17 +49,17 @@ var flexo, flexoConfig = {
 				joins: ['test_join'],
 				types: {
 					_id: {type: 'id'},
-					tsCreate: {type: 'number'},
-					tsUpdate: {type: 'number'},
-					name: { type: 'string', validation: {len: [0, 20]}, messages: {} },
-					inn: { type: 'string' },
-					comment: { type: 'string' },
+					tsCreate: {type: 'int'},
+					tsUpdate: {type: 'int'},
+					name: { type: 'words', validation: {len: [0, 20]}, messages: {} },
+					inn: { type: 'numeric' },
+					comment: { type: 'str' },
 					join_id: { type: 'id' },
-					array_of_id: { type: 'array', of: 'id', from: 'test_join' },
+					array_of_id: { type: 'ids', from: 'test_join' },
 					test_join__id: {type: 'id'},
-					test_join_name: { type: 'string' },
-					test_join_inn: { type: 'string' },
-					test_join_comment: { type: 'string' }
+					test_join_name: { type: 'str' },
+					test_join_inn: { type: 'str' },
+					test_join_comment: { type: 'str' }
 				}
 			}
 		},
@@ -73,12 +73,12 @@ var flexo, flexoConfig = {
 				joins: [],
 				types: {
 					_id: {type: 'id'},
-					tsCreate: {type: 'number'},
-					tsUpdate: {type: 'number'},
-					name: { type: 'string' },
-					inn: { type: 'string' },
-					comment: { type: 'string' },
-					array_of_id: { type: 'array', of: 'id', from: 'test_join' }
+					tsCreate: {type: 'int'},
+					tsUpdate: {type: 'int'},
+					name: { type: 'words' },
+					inn: { type: 'numeric' },
+					comment: { type: 'str' },
+					array_of_id: { type: 'ids', from: 'test_join' }
 				}
 			}
 		}
@@ -91,7 +91,7 @@ var flexo_2 = { scheme: 'test_join', fields: ['_id', 'tsCreate', 'tsUpdate', 'na
 var f1_ins, f2_ins;
 
 function rnd() {
-	return (Math.random() * 10000).toString( 10 );
+	return parseInt( Math.random() * 10000 ).toString( 10 );
 }
 
 
@@ -175,10 +175,10 @@ module.exports = {
 	'Insert documents into `test_join`': function( t ) {
 		t.expect( 9 );
 
-		flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, documents: [
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: [rnd(), rnd(), rnd()]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: [rnd(), rnd()]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: rnd() }
+		flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, query: [
+			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd(), 'xx' + rnd()]},
+			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd()]},
+			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: 'xx' + rnd() }
 		], options: {}}, function( err, data ) {
 			t.ifError( err );
 
@@ -231,7 +231,7 @@ module.exports = {
 	'Insert documents into `test`': function( t ) {
 		t.expect( 11 );
 
-		flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, documents: [
+		flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, query: [
 			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[2]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id, f2_ins[0]._id]},
 			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[1]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id]},
 			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[0]._id, array_of_id: [f2_ins[2]._id]}
@@ -263,7 +263,7 @@ module.exports = {
 	},
 
 	'Find insertions into `test`': function( t ) {
-		var i, ids = [ '$in' ];
+		var i, ids = [];
 		t.expect( 8 );
 
 		for ( i = 0; i < f1_ins.length; i += 1 ) {
@@ -285,7 +285,6 @@ module.exports = {
 			t.done();
 		} );
 	},
-
 	'Modify `test` document': function( t ) {
 		t.expect( 3 );
 

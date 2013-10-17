@@ -3,6 +3,6 @@
 module.exports = {
 	name: 'testManager',
 	root: {
-		name: { type: 'string' }
+		name: { type: 'str' }
 	}
 };

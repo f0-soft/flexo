@@ -12,11 +12,11 @@ module.exports = {
 	// содержит изменяемые поля
 	root: {
 		// `_id`, `tsCreate`, `tsUpdate` добавляются автоматически
-		name: { type: 'string', validation: {len: [0, 20]}, messages: {} },
-		inn: { type: 'string' },
-		comment: { type: 'string' },
+		name: { type: 'str', validation: {len: [0, 20]}, messages: {} },
+		inn: { type: 'str' },
+		comment: { type: 'str' },
 		join_id: { type: 'id' }, // автоматически обязательное поле из-за джойна
-		array_of_id: { type: 'array', of: 'id', from: 'test_join', inline: 'array_of_id' } // может быть пустым
+		array_of_id: { type: 'ids', from: 'test_join' } // может быть пустым
 	},
 
 

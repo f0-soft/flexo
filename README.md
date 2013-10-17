@@ -13,10 +13,8 @@ Flexo
 
 
 ## TODO
-* поддержка хуков на Pre-/Post- Find/Insert/Modify/Delete, способные предотвратить действие;
 * поддержка уникальных индексов, предотвращающих создание дублирующих документов;
-* поддержка вычисляемых полей;
-* валидация документов при Insert/Modify.
+* поддержка вычисляемых полей.
 
 
 
@@ -32,21 +30,18 @@ exports.name: 'test';
 // `_id`, `tsCreate`, `tsUpdate` добавляются автоматически
 // ключ - название поля
 // значение - объект со свойствами поля:
-// * type - тип в БД: boolean, number, string, array, id
-// * of - определяет вложенный тип данных масива, когда type == array, содержит один из типов: boolean, number, string, id
+// * type - тип в БД: str, words, int, float, bool, array, id, ids, idpath, money, numeric, phone
 // * from - содержит название коллекции на которую ссылается поле
 // * link - содержит название пути, который должен быть встроен в документы текущей коллекции
-// * validation - объект правил валидации значений поля, где ключ - название метода валидации, значение - массив аргументов метода (используется библиотека validator)
-// * messages - объект сообщений об ошибке валидации, где ключ - название метода валидации, значение - строка сообщения
 // * title - название поля для админки
 // * description - расширенное описание поля для админки
 exports.root: {
-    name: { type: 'string', validation: {len: [0, 20]}, messages: { len: 'Введите значение длиной не более 20 символов' } },
-    inn: { type: 'string' },
-    index: { type: 'number' },
-    comment: { type: 'string' },
+    name: { type: 'str' },
+    inn: { type: 'numeric' },
+    index: { type: 'int' },
+    comment: { type: 'str' },
     join_id: { type: 'id' }, // автоматически обязательное поле из-за джойна
-    array_of_id: { type: 'array', of: 'id', from: 'test_join', link: 'array_of_id' } // может быть пустым
+    array_of_id: { type: 'idpath', from: 'test_join', link: 'array_of_id' } // может быть пустым
 };
 
 
@@ -68,8 +63,9 @@ exports.join: {
 // * schemes - объект, справочник всех схем, доступных flexo, где за каждым ключом скрывается объект со свойствами:
 // * * dict - справочник по текущей схеме
 // * * scheme - схема из файла
-// * request - обрабатываемый запрос
-// хук обязательно должен рано или поздно вызвать переданный ему коллбек, с ошибкой или без
+// * request - доступно в запросах `before`, содержит элемент массива запросов
+// * result - доступно в запросах `after`, содержит элемент массива результатов
+// все хуки из набора должны отработать не позднее, чем чарез 60 секунда (по умолчанию), иначе в ответ на запрос будет возвращена ошибка
 exports.before: { // на данный момент может содержать только `insert`, `modify`
     insert: [ // функции в массиве запускаются через async.parallel
         function( callback ) { return callback( null, true ); }
@@ -108,6 +104,7 @@ exports.unique: [
 * ```options``` - объект
 	* ```storage``` - объект, содержит функции работы с хранилищем (```find```, ```insert```, ```modify```, ```delete```)
 	* ```schemes``` - объект, содержит доступные схемы со справочниками
+	* ```hook_timeout``` - число, таймаут выполнения хуков в секундах
 * ```callback( error, collection )``` - функция
 	* ```collection``` - объект, содержит функции работы с библиотекой: ```find```, ```insert```, ```modify```, ```delete```
 
@@ -130,12 +127,12 @@ var schemes = {
 			joins: [],
 
 			types: { // справочник типов всех полей (значения полей из схемы), type обязателен
-				_id: {type: 'id'},
-				tsCreate: {type: 'number'},
-				tsUpdate: {type: 'number'},
-				number: { type: 'string' },
-				comments: { type: 'string' },
-				services: { type: 'array', of: 'id', scheme: 'test_join' }
+				_id: { type: 'id' },
+				tsCreate: { type: 'int' },
+				tsUpdate: { type: 'int' },
+				number: { type: 'str' },
+				comments: { type: 'str' },
+				services: { type: 'ids', from: 'test_join' }
 			}
 		}
 	},
@@ -155,18 +152,18 @@ var schemes = {
 			joins: ['test_join'],
 
 			types: { // справочник типов всех полей (значения полей из схемы), type обязателен
-				_id: {type: 'id'},
-				tsCreate: {type: 'number'},
-				tsUpdate: {type: 'number'},
-				name: { type: 'string', validation: {len: [0, 20]}, messages: {} },
-				inn: { type: 'string' },
-				comment: { type: 'string' },
+				_id: { type: 'id' },
+				tsCreate: { type: 'int' },
+				tsUpdate: { type: 'int' },
+				name: { type: 'words' },
+				inn: { type: 'numeric' },
+				comment: { type: 'str' },
 				join_id: { type: 'id' },
-				array_of_id: { type: 'array', of: 'id', scheme: 'test_join' },
-				test_join__id: {type: 'id'},
-				test_join_name: { type: 'string' },
-				test_join_inn: { type: 'string' },
-				test_join_comment: { type: 'string' }
+				array_of_id: { type: 'ids', from: 'test_join' },
+				test_join__id: { type: 'id' },
+				test_join_name: { type: 'str' },
+				test_join_inn: { type: 'str' },
+				test_join_comment: { type: 'str' }
 			}
 		}
 	}
@@ -186,7 +183,7 @@ var schemes = {
 
 
 
-### container.find( scheme, fields, query, options, callback )
+### container.find( request, callback )
 Осуществляет поиск документов в хранилище.
 Возвращает удовлетворяющие запросу документы (и их количество).
 
@@ -204,10 +201,11 @@ var schemes = {
     * ```data``` - объект
 	    * ```result``` - массив, содержит объекты документов
 	    * ```[count]``` - число, общее количество удовлетворяющих запросу документов
+	    * ```[dep]``` - число, наличие ссылок на документ, возвращается при поиске документа по ```_id```
 
 
 
-### container.aggregate( scheme, pipeline, callback )
+### container.aggregate( request, callback )
 Производит аггреацию, вызывает аггрегацию Rabbit.
  
 Параметры:
@@ -216,17 +214,10 @@ var schemes = {
     * ```pipeline``` - массив, содержит последовательность агрегации в естественном виде
 * ```callback( error, documents )``` - строка, содержит название схемы
     * ```documents``` - массив, содержит результаты агрегации
-    
-Запрос к rabbit.aggregate( request, callback ):
-* ```request``` - массив
-    * ```collection_name``` - строка, название коллекции
-    * ```pipeline``` - массив, содержит объекты команд агрегации
-* ```callback( error, data )``` - функция
-    * ```data``` - массив, содержит результаты агрегации
 
 
 
-### container.insert( scheme, fields, document, options, callback )
+### container.insert( request, callback )
 Проверяет полученные документы, присоединяет к ним зависимые блоки, сохраняет результирующие документы в хранилище.
 Возвращает созданные документы.
 
@@ -239,7 +230,7 @@ var schemes = {
 * ```request``` - объект
     * ```scheme``` - строка, содержит название схемы
     * ```fields``` - массив, содержит названия полей, с которыми надо вернуть документы
-    * ```documents``` - массив
+    * ```query``` - массив
         * ```*``` - объект, содержит поля нового документа
     * ```options``` - объект
 * ```callback( error, documents )``` - функция
@@ -247,23 +238,24 @@ var schemes = {
 
 
 
-### container.modify( scheme, query, options, callback )
+### container.modify( request, callback )
 Производит обновление параметров документов в хранилище.
 Возвращает массив измененных документов, сокращенных до ```_id```, ```tsUpdate```.
 
 Параметры:
 * ```request``` - объект
     * ```name``` - строка, содержит название схемы
-    * ```query``` - объект или массив объектов ```query```
-	    * ```selector``` - объект, поисковый запрос Mongo, обязательно должен содержать поля ```_id``` и ```tsUpdate```
-	    * ```properties``` - объект новых значений
+    * ```query``` - массив объектов ```query```
+        * ```*``` - объект
+	        * ```selector``` - объект, поисковый запрос Mongo, обязательно должен содержать поля ```_id``` и ```tsUpdate```
+	        * ```properties``` - объект новых значений
     * ```options``` - объект
 * ```callback( error, documents )``` - функция
 	* ```documents``` - массив, содержит объекты документов, сокращенных до ```_id```, ```tsUpdate```
 
 
 
-### container.delete( scheme, query, options, callback )
+### container.delete( request, callback )
 Удаляет заданные документы в хранилище.
 Возвращает массив удаленных документов, сокращенных до ```_id```.
 

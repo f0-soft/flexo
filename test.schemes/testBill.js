@@ -3,8 +3,8 @@
 module.exports = {
 	name: 'testBill',
 	root: {
-		date: { type: 'number' },
-		attachment_id: { type: 'array', of: 'id', from: 'testAttachment', link: 'bill-manager' } // в пути схема встречается только 1 раз, поэтому не нужно указывать позицию схемы в пути
+		date: { type: 'int' },
+		attachment_id: { type: 'idpath', from: 'testAttachment', link: 'bill-manager' } // в пути схема встречается только 1 раз, поэтому не нужно указывать позицию схемы в пути
 	},
 
 	before: {
