@@ -36,13 +36,13 @@ module.exports = {
 		insert: [
 			function( callback ) {
 				console.log( 'before insert' );
-				return callback( null, true );
+				return callback( null, this.query );
 			}
 		],
 		modify: [
 			function( callback ) {
 				console.log( 'before modify' );
-				return callback( null, true );
+				return callback( null, this.query );
 			}
 		]
 	},
