@@ -10,12 +10,12 @@ module.exports = {
 	before: {
 		insert: [
 			function( callback ) {
-				return callback( null );
+				return callback( null, this.query );
 			}
 		],
 		modify: [
 			function( callback ) {
-				return callback( null );
+				return callback( null, this.query );
 			}
 		]
 	},

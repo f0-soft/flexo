@@ -14,7 +14,7 @@
  */
 
 var mock;
-mock = true;
+//mock = true;
 
 //process.env.DEBUG = true;
 var log = function() { return arguments.length; };
@@ -98,6 +98,7 @@ function rnd() {
 
 module.exports = {
 	'Init storage': function( t ) {
+		catchAll( t );
 		t.expect( 5 );
 
 		Rabbit.init( storageConfig, function( err, result ) {
@@ -120,6 +121,7 @@ module.exports = {
 	},
 
 	'Init Flexo': function( t ) {
+		catchAll( t );
 		t.expect( 2 );
 
 		Flexo.init( flexoConfig, function( err, container ) {
@@ -133,6 +135,7 @@ module.exports = {
 	},
 
 	'Check `test` is empty': function( t ) {
+		catchAll( t );
 		t.expect( 8 );
 
 		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
@@ -153,6 +156,7 @@ module.exports = {
 	},
 
 	'Check `test_join` is empty': function( t ) {
+		catchAll( t );
 		t.expect( 8 );
 
 		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {}, options: {count: true}}, function( err, data ) {
@@ -173,6 +177,7 @@ module.exports = {
 	},
 
 	'Insert documents into `test_join`': function( t ) {
+		catchAll( t );
 		t.expect( 9 );
 
 		flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, query: [
@@ -204,6 +209,7 @@ module.exports = {
 	},
 
 	'Find insertions into `test_join`': function( t ) {
+		catchAll( t );
 		var i, ids = [];
 		t.expect( 8 );
 
@@ -229,6 +235,7 @@ module.exports = {
 	},
 
 	'Insert documents into `test`': function( t ) {
+		catchAll( t );
 		t.expect( 11 );
 
 		flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, query: [
@@ -263,6 +270,7 @@ module.exports = {
 	},
 
 	'Find insertions into `test`': function( t ) {
+		catchAll( t );
 		var i, ids = [];
 		t.expect( 8 );
 
@@ -286,6 +294,7 @@ module.exports = {
 		} );
 	},
 	'Modify `test` document': function( t ) {
+		catchAll( t );
 		t.expect( 3 );
 
 		flexo.modify( {name: flexo_1.scheme, query: [
@@ -301,6 +310,7 @@ module.exports = {
 	},
 
 	'Check `test` document modification': function( t ) {
+		catchAll( t );
 		t.expect( 12 );
 
 		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: f1_ins[0]._id}, options: {}}, function( err, data ) {
@@ -324,6 +334,7 @@ module.exports = {
 	},
 
 	'Delete `test` document': function( t ) {
+		catchAll( t );
 		t.expect( 6 );
 
 		flexo.delete( {name: flexo_1.scheme, query: [ f1_ins[1] ], options: {}}, function( err, data ) {
@@ -340,6 +351,7 @@ module.exports = {
 	},
 
 	'Check `test` document deletion': function( t ) {
+		catchAll( t );
 		t.expect( 13 );
 
 		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
@@ -382,3 +394,8 @@ var t = {
 	ifError: function( value ) { return value;},
 	done: function() { return true;}
 };
+
+function catchAll( test ) {
+	process.removeAllListeners( 'uncaughtException' );
+	process.on( 'uncaughtException', test.done );
+}
