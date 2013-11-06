@@ -16,7 +16,7 @@ module.exports = {
 		inn: { type: 'str' },
 		comment: { type: 'str' },
 		join_id: { type: 'id' }, // автоматически обязательное поле из-за джойна
-		array_of_id: { type: 'ids', from: 'test_join' } // может быть пустым
+		array_of_id: { type: 'id', from: 'test_join' } // может быть пустым
 	},
 
 

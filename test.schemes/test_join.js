@@ -10,6 +10,6 @@ module.exports = {
 		name: { type: 'str' },
 		inn: { type: 'str' },
 		comment: { type: 'str' },
-		array_of_id: { type: 'ids', from: 'test_join' } // может быть пустым
+		array_of_id: { type: 'id', from: 'test_join' } // может быть пустым
 	}
 };

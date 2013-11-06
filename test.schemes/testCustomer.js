@@ -4,6 +4,6 @@ module.exports = {
 	name: 'testCustomer',
 	root: {
 		name: { type: 'str' },
-		manager_id: { type: 'ids', from: 'testManager' }
+		manager_id: { type: 'id', from: 'testManager' }
 	}
 };

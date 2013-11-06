@@ -48,15 +48,15 @@ var flexo, flexoConfig = {
 				joinProperties: ['join_id'],
 				joins: ['test_join'],
 				types: {
-					_id: {type: 'id'},
+					_id: {type: '_id'},
 					tsCreate: {type: 'int'},
 					tsUpdate: {type: 'int'},
 					name: { type: 'words', validation: {len: [0, 20]}, messages: {} },
 					inn: { type: 'numeric' },
 					comment: { type: 'str' },
 					join_id: { type: 'id' },
-					array_of_id: { type: 'ids', from: 'test_join' },
-					test_join__id: {type: 'id'},
+					array_of_id: { type: 'id', from: 'test_join' },
+					test_join__id: {type: '_id'},
 					test_join_name: { type: 'str' },
 					test_join_inn: { type: 'str' },
 					test_join_comment: { type: 'str' }
@@ -72,13 +72,13 @@ var flexo, flexoConfig = {
 				joinProperties: [],
 				joins: [],
 				types: {
-					_id: {type: 'id'},
+					_id: {type: '_id'},
 					tsCreate: {type: 'int'},
 					tsUpdate: {type: 'int'},
 					name: { type: 'words' },
 					inn: { type: 'numeric' },
 					comment: { type: 'str' },
-					array_of_id: { type: 'ids', from: 'test_join' }
+					array_of_id: { type: 'id', from: 'test_join' }
 				}
 			}
 		}
@@ -326,7 +326,7 @@ module.exports = {
 				t.ok( data.result[0]._id, 'Document has no field `_id`' );
 				t.ok( data.result[0].join_id, 'Document has no field `join_id`' );
 				t.deepEqual( data.result[0]._id, f1_ins[0]._id, 'Find returned wrong document' );
-				t.deepEqual( data.result[0].join_id, f2_ins[0]._id, 'Document wasn\'t modified' );
+				t.deepEqual( data.result[0].join_id, [f2_ins[0]._id], 'Document wasn\'t modified' );
 			} );
 
 			t.done();

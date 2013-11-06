@@ -4,8 +4,8 @@ module.exports = {
 	name: 'scheme-0',
 	root: {
 		name: { type: 'str' },
-		a_ids: { type: 'ids' },
-		a_ids__: {type: 'ids', link: [
+		a_ids: { type: 'id' },
+		a_ids__: {type: 'id', link: [
 			// имя схемы, имя поля схемы (определяющего связи со следующим уровнем)
 			[ 'scheme-A', 'b_ids' ],
 			[ 'scheme-B', 'c_ids' ]
