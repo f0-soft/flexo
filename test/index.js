@@ -17,74 +17,33 @@ var mock;
 //mock = true;
 
 //process.env.DEBUG = true;
-var log = function() { return arguments.length; };
+var log = function() { };
 if ( process.env.DEBUG ) { log = console.log; }
 
-var Rabbit = mock ? require( '../mock/storage' ) : require( 'f0.rabbit' );
+var _ = require( 'underscore' );
 var Flexo = require( '../' );
+var Starter = require( 'f0.starter' );
 
 
-
-var storageConfig = {
-	gPrefixCol: {
-		c2p: {
+var starterConfig = _.extend(
+	{},
+	Starter.config,
+	{
+		flexo: require( '../' ),
+		view: Starter.mock.view,
+		controller: Starter.mock.controller,
+		flexo_path: __dirname + '/../test.schemes',
+		link_path: __dirname + '/../test.links',
+		view_path: __dirname + '/../test.view',
+		template_path: __dirname + '/../test.tpl',
+		collection_alias: {
 			test: 'tt',
 			test_join: 'tj'
-		},
-		p2c: {
-			tt: 'test',
-			tj: 'test_join'
 		}
-	}};
-var flexo, flexoConfig = {
-	storage: undefined,
-	schemes: {
-
-		test: {
-			scheme: require( '../test.schemes/test' ),
-			dict: {
-				all: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'join_id', 'array_of_id', 'test_join__id', 'test_join_name', 'test_join_inn', 'test_join_comment'],
-				mutable: ['name', 'inn', 'comment', 'join_id', 'array_of_id'],
-				joinProperties: ['join_id'],
-				joins: ['test_join'],
-				types: {
-					_id: {type: '_id'},
-					tsCreate: {type: 'int'},
-					tsUpdate: {type: 'int'},
-					name: { type: 'words', validation: {len: [0, 20]}, messages: {} },
-					inn: { type: 'numeric' },
-					comment: { type: 'str' },
-					join_id: { type: 'id' },
-					array_of_id: { type: 'id', from: 'test_join' },
-					test_join__id: {type: '_id'},
-					test_join_name: { type: 'str' },
-					test_join_inn: { type: 'str' },
-					test_join_comment: { type: 'str' }
-				}
-			}
-		},
-
-		test_join: {
-			scheme: require( '../test.schemes/test_join' ),
-			dict: {
-				all: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'array_of_id'],
-				mutable: ['name', 'inn', 'comment', 'array_of_id'],
-				joinProperties: [],
-				joins: [],
-				types: {
-					_id: {type: '_id'},
-					tsCreate: {type: 'int'},
-					tsUpdate: {type: 'int'},
-					name: { type: 'words' },
-					inn: { type: 'numeric' },
-					comment: { type: 'str' },
-					array_of_id: { type: 'id', from: 'test_join' }
-				}
-			}
-		}
-
 	}
-};
+);
+if ( mock ) { starterConfig.rabbit = Starter.mock.rabbit; }
+var flexo;
 
 var flexo_1 = { scheme: 'test', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'join_id', 'array_of_id', 'test_join__id', 'test_join_name', 'test_join_inn', 'test_join_comment'] };
 var flexo_2 = { scheme: 'test_join', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'array_of_id'] };
@@ -97,38 +56,15 @@ function rnd() {
 
 
 module.exports = {
-	'Init storage': function( t ) {
-		catchAll( t );
-		t.expect( 5 );
-
-		Rabbit.init( storageConfig, function( err, result ) {
-			t.ifError( err );
-
-			t.ok( Rabbit.find );
-			t.ok( Rabbit.insert );
-			t.ok( Rabbit.modify );
-			t.ok( Rabbit.delete );
-
-			flexoConfig.storage = {
-				find: Rabbit.find,
-				insert: Rabbit.insert,
-				modify: Rabbit.modify,
-				delete: Rabbit.delete
-			};
-
-			t.done();
-		} );
-	},
-
-	'Init Flexo': function( t ) {
+	'Init': function( t ) {
 		catchAll( t );
 		t.expect( 2 );
 
-		Flexo.init( flexoConfig, function( err, container ) {
+		Starter.init( starterConfig, function( err, c, all ) {
 			t.ifError( err );
 
-			t.ok( container );
-			flexo = container;
+			t.ok( all.flexo );
+			flexo = all.flexo;
 
 			t.done();
 		} );
