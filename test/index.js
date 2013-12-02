@@ -29,6 +29,7 @@ var starterConfig = _.extend(
 	{},
 	Starter.config,
 	{
+		'rabbit-server': Starter.mock['rabbit-server'],
 		flexo: require( '../' ),
 		view: Starter.mock.view,
 		controller: Starter.mock.controller,
@@ -38,12 +39,14 @@ var starterConfig = _.extend(
 		template_path: __dirname + '/../test.tpl',
 		collection_alias: {
 			test: 'tt',
-			test_join: 'tj'
+			test_join: 'tj',
+			bills: 'bl',
+			bank: 'bn'
 		}
 	}
 );
 if ( mock ) { starterConfig.rabbit = Starter.mock.rabbit; }
-var flexo;
+var flexo, rabbit;
 
 var flexo_1 = { scheme: 'test', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'join_id', 'array_of_id', 'test_join__id', 'test_join_name', 'test_join_inn', 'test_join_comment'] };
 var flexo_2 = { scheme: 'test_join', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'array_of_id'] };
@@ -65,6 +68,7 @@ module.exports = {
 
 			t.ok( all.flexo );
 			flexo = all.flexo;
+			rabbit = all.rabbit;
 
 			t.done();
 		} );
@@ -321,7 +325,43 @@ module.exports = {
 
 			t.done();
 		} );
-	}
+	}/*,
+
+	'Separate count': function( t ) {
+		catchAll( t );
+		t.expect( 2 );
+
+		var SC = require( '../lib/flexo/separateCount' );
+		SC.init( { storage: rabbit } );
+		console.time( 'StartSeparateCount' );
+		SC.separateCount( {
+			parent: {
+				coll: 'bills',
+				field_sum: 'sum',
+				field_parent: '_id',
+				selector: {}
+			},
+			child: {
+				coll: 'bank',
+				field_sum: 'sum',
+				field_parent: 'bill_id',
+				selector: {}
+			},
+			groups: [
+				{$gte: 100},
+				{$gte: 66, $lt: 100},
+				{$gte: 33, $lt: 66},
+				{$gt: 0, $lt: 33},
+				{$eq: 0}
+			]
+		}, function( err, res ) {
+			console.timeEnd( 'StartSeparateCount' );
+			t.ifError( err );
+			t.ok( res );
+			console.log( res );
+			t.done();
+		} );
+	}*/
 };
 
 

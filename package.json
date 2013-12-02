@@ -26,6 +26,7 @@
 	"dependencies": {
 		"async": "",
 		"validator": "",
+		"nexttick": "",
 		"f0.argstype": "git+ssh://git@github.com:f0-soft/argstype.git"
 	},
 	"devDependencies": {
