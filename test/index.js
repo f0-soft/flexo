@@ -346,12 +346,14 @@ module.exports = {
 				selector: {}
 			},
 			groups: [
-				{$gte: 100},
-				{$gte: 66, $lt: 100},
-				{$gte: 33, $lt: 66},
-				{$gt: 0, $lt: 33},
-				{$eq: 0}
+				{ $gte: 100 },
+				{ $gte: 66, $lt: 100 },
+				{ $gte: 33, $lt: 66 },
+				{ $gt: 0, $lt: 33 },
+				{ $eq: 0 }
 			]
+		}, function( percent ) {
+			console.log( percent );
 		}, function( err, res ) {
 			console.timeEnd( 'groupCount' );
 			t.ifError( err );
