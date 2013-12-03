@@ -29,7 +29,7 @@ var starterConfig = _.extend(
 	{},
 	Starter.config,
 	{
-		'rabbit-server': Starter.mock['rabbit-server'],
+//		'rabbit-server': Starter.mock['rabbit-server'],
 		flexo: require( '../' ),
 		view: Starter.mock.view,
 		controller: Starter.mock.controller,
@@ -331,20 +331,18 @@ module.exports = {
 		catchAll( t );
 		t.expect( 2 );
 
-		var SC = require( '../lib/flexo/separateCount' );
-		SC.init( { storage: rabbit } );
-		console.time( 'StartSeparateCount' );
-		SC.separateCount( {
+		console.time( 'groupCount' );
+		flexo.groupCount( {
 			parent: {
 				coll: 'bills',
 				field_sum: 'sum',
-				field_parent: '_id',
+				field_link: '_id',
 				selector: {}
 			},
 			child: {
 				coll: 'bank',
 				field_sum: 'sum',
-				field_parent: 'bill_id',
+				field_link: 'bill_id',
 				selector: {}
 			},
 			groups: [
@@ -355,7 +353,7 @@ module.exports = {
 				{$eq: 0}
 			]
 		}, function( err, res ) {
-			console.timeEnd( 'StartSeparateCount' );
+			console.timeEnd( 'groupCount' );
 			t.ifError( err );
 			t.ok( res );
 			console.log( res );
