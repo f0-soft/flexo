@@ -21,7 +21,6 @@ var log = function() { };
 if ( process.env.DEBUG ) { log = console.log; }
 
 var _ = require( 'underscore' );
-var Flexo = require( '../' );
 var Starter = require( 'f0.starter' );
 
 
@@ -29,7 +28,6 @@ var starterConfig = _.extend(
 	{},
 	Starter.config,
 	{
-//		'rabbit-server': Starter.mock['rabbit-server'],
 		flexo: require( '../' ),
 		view: Starter.mock.view,
 		controller: Starter.mock.controller,
@@ -325,43 +323,7 @@ module.exports = {
 
 			t.done();
 		} );
-	}/*,
-
-	'Separate count': function( t ) {
-		catchAll( t );
-		t.expect( 2 );
-
-		console.time( 'groupCount' );
-		flexo.groupCount( {
-			parent: {
-				coll: 'bills',
-				field_sum: 'sum',
-				field_link: '_id',
-				selector: {}
-			},
-			child: {
-				coll: 'bank',
-				field_sum: 'sum',
-				field_link: 'bill_id',
-				selector: {}
-			},
-			groups: [
-				{ $gte: 100 },
-				{ $gte: 66, $lt: 100 },
-				{ $gte: 33, $lt: 66 },
-				{ $gt: 0, $lt: 33 },
-				{ $eq: 0 }
-			]
-		}, function( percent ) {
-			console.log( percent );
-		}, function( err, res ) {
-			console.timeEnd( 'groupCount' );
-			t.ifError( err );
-			t.ok( res );
-			console.log( res );
-			t.done();
-		} );
-	}*/
+	}
 };
 
 
