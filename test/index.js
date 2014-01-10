@@ -32,6 +32,7 @@ var starterConfig = _.extend(
 		view: Starter.mock.view,
 		controller: Starter.mock.controller,
 		flexo_path: __dirname + '/../test.schemes',
+		type_path: __dirname + '/../node_modules/f0.starter/scheme/types',
 		link_path: __dirname + '/../test.links',
 		view_path: __dirname + '/../test.view',
 		template_path: __dirname + '/../test.tpl',
