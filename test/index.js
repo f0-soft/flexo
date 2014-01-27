@@ -29,6 +29,7 @@ var starterConfig = _.extend(
 	Starter.config,
 	{
 		flexo: require( '../' ),
+		'flexo-client': Starter.mock['flexo-client'],
 		view: Starter.mock.view,
 		controller: Starter.mock.controller,
 		flexo_path: __dirname + '/../test.schemes',
