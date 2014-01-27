@@ -167,8 +167,11 @@ var requestString = code( searchOptions ) + searchString;
 	* `storage` - объект, содержит функции работы с хранилищем (`find`, `insert`, `modify`, `delete`)
 	* `schemes` - объект, содержит доступные схемы со справочниками
 	* `hook_timeout` - число, таймаут выполнения хуков в секундах
-* `callback( error, collection )` - функция
-	* `collection` - объект, содержит функции работы с библиотекой: `find`, `insert`, `modify`, `delete`
+	* `types` - объект, перечень поддерживаемых типов данных
+	* `server` - объект
+	    * `port` - число, порт входящих соединений
+* `callback( error, server )` - функция
+	* `server` - объект, экземпляр сервера upnode, предоставляющего доступ к методам библиотеки: `find`, `insert`, `modify`, `delete`
 
 Пример `schemes`
 ```
