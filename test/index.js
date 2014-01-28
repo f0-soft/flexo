@@ -57,275 +57,328 @@ function rnd() {
 }
 
 
+exports['Init'] = function( t ) {
+	catchAll( t );
+	t.expect( 2 );
 
-module.exports = {
-	'Init': function( t ) {
-		catchAll( t );
-		t.expect( 2 );
+	Starter.init( starterConfig, function( err, c, all ) {
+		t.ifError( err );
 
-		Starter.init( starterConfig, function( err, c, all ) {
-			t.ifError( err );
+		t.ok( all.flexo );
+		flexo = all.flexo;
+		rabbit = all.rabbit;
 
-			t.ok( all.flexo );
-			flexo = all.flexo;
-			rabbit = all.rabbit;
+		t.done();
+	} );
+};
 
-			t.done();
+exports['Check `test` is empty'] = function( t ) {
+	catchAll( t );
+	t.expect( 8 );
+
+	flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.deepEqual( data.count, 0, 'Returned count is not equal 0' );
+
+			t.ok( Array.isArray( data.result ) );
+			t.deepEqual( data.result.length, 0, 'Empty DB before test' );
+
+			if ( data.count || data.result.length ) {
+				console.log( 'Тестовая коллекция `test` должна быть пустой' );
+				process.exit();
+			}
 		} );
-	},
 
-	'Check `test` is empty': function( t ) {
-		catchAll( t );
-		t.expect( 8 );
+		t.done();
+	} );
+};
 
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
-			t.ifError( err );
+exports['Check `test_join` is empty'] = function( t ) {
+	catchAll( t );
+	t.expect( 9 );
 
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.deepEqual( data.count, 0, 'Returned count is not equal 0' );
+	flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {}, options: {count: true}}, function( err, data ) {
+		t.ifError( err );
 
-				t.ok( Array.isArray( data.result ) );
-				t.deepEqual( data.result.length, 0, 'Empty DB before test' );
-			} );
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields )
+			t.deepEqual( data.count, 0, 'Returned count is not equal 0' );
 
-			t.done();
+			t.ok( Array.isArray( data.result ) );
+			t.deepEqual( data.result.length, 0, 'Empty DB before test' );
+
+			if ( data.count || data.result.length ) {
+				console.log( 'Тестовая коллекция `test` должна быть пустой' );
+				process.exit();
+			}
 		} );
-	},
 
-	'Check `test_join` is empty': function( t ) {
-		catchAll( t );
-		t.expect( 9 );
+		t.done();
+	} );
+};
 
-		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {}, options: {count: true}}, function( err, data ) {
-			t.ifError( err );
+exports['Insert documents into `test_join`'] = function( t ) {
+	catchAll( t );
+	t.expect( 12 );
 
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields )
-				t.deepEqual( data.count, 0, 'Returned count is not equal 0' );
+	flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, query: [
+		{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd(), 'xx' + rnd()]},
+		{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd()]},
+		{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: 'xx' + rnd() }
+	], options: {}}, function( err, data ) {
+		t.ifError( err );
 
-				t.ok( Array.isArray( data.result ) );
-				t.deepEqual( data.result.length, 0, 'Empty DB before test' );
-			} );
+		t.ok( data, 'No data returned' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.deepEqual( data.result.length, 3, 'Documents insertion didn\'t return result' );
 
-			t.done();
+			t.ok( data.result[0]._id, 'Document has no _id' );
+			t.ok( data.result[1]._id, 'Document has no _id' );
+			t.ok( data.result[2]._id, 'Document has no _id' );
+
+			t.ok( data.result[0].tsUpdate, 'Document has no tsUpdate' );
+			t.ok( data.result[1].tsUpdate, 'Document has no tsUpdate' );
+			t.ok( data.result[2].tsUpdate, 'Document has no tsUpdate' );
+
+			f2_ins = [
+				{_id: data.result[0]._id, tsUpdate: data.result[0].tsUpdate},
+				{_id: data.result[1]._id, tsUpdate: data.result[1].tsUpdate},
+				{_id: data.result[2]._id, tsUpdate: data.result[2].tsUpdate}
+			];
 		} );
-	},
 
-	'Insert documents into `test_join`': function( t ) {
-		catchAll( t );
-		t.expect( 12 );
+		t.done();
+	} );
+};
 
-		flexo.insert( {name: flexo_2.scheme, fields: flexo_2.fields, query: [
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd(), 'xx' + rnd()]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: ['xx' + rnd(), 'xx' + rnd()]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), array_of_id: 'xx' + rnd() }
-		], options: {}}, function( err, data ) {
-			t.ifError( err );
+exports['Find insertions into `test_join`'] = function( t ) {
+	catchAll( t );
+	var i, ids = [];
+	t.expect( 9 );
 
-			t.ok( data, 'No data returned' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.deepEqual( data.result.length, 3, 'Documents insertion didn\'t return result' );
-
-				t.ok( data.result[0]._id, 'Document has no _id' );
-				t.ok( data.result[1]._id, 'Document has no _id' );
-				t.ok( data.result[2]._id, 'Document has no _id' );
-
-				t.ok( data.result[0].tsUpdate, 'Document has no tsUpdate' );
-				t.ok( data.result[1].tsUpdate, 'Document has no tsUpdate' );
-				t.ok( data.result[2].tsUpdate, 'Document has no tsUpdate' );
-
-				f2_ins = [
-					{_id: data.result[0]._id, tsUpdate: data.result[0].tsUpdate},
-					{_id: data.result[1]._id, tsUpdate: data.result[1].tsUpdate},
-					{_id: data.result[2]._id, tsUpdate: data.result[2].tsUpdate}
-				];
-			} );
-
-			t.done();
-		} );
-	},
-
-	'Find insertions into `test_join`': function( t ) {
-		catchAll( t );
-		var i, ids = [];
-		t.expect( 9 );
-
-		for ( i = 0; i < f2_ins.length; i += 1 ) {
-			ids.push( f2_ins[i]._id );
-		}
-
-		flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.deepEqual( data.count, 3, 'Wrong count' );
-
-				t.ok( Array.isArray( data.result ) );
-				t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
-			} );
-
-			t.done();
-		} )
-	},
-
-	'Insert documents into `test`': function( t ) {
-		catchAll( t );
-		t.expect( 13 );
-
-		flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, query: [
-			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[2]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id, f2_ins[0]._id]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[1]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id]},
-			{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[0]._id, array_of_id: [f2_ins[2]._id]}
-		], options: {}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
-
-				t.ok( data.result[0]._id, 'Document has no _id' );
-				t.ok( data.result[1]._id, 'Document has no _id' );
-				t.ok( data.result[2]._id, 'Document has no _id' );
-
-				t.ok( data.result[0].tsUpdate, 'Document has no tsUpdate' );
-				t.ok( data.result[1].tsUpdate, 'Document has no tsUpdate' );
-				t.ok( data.result[2].tsUpdate, 'Document has no tsUpdate' );
-
-				f1_ins = [
-					{_id: data.result[0]._id, tsUpdate: data.result[0].tsUpdate},
-					{_id: data.result[1]._id, tsUpdate: data.result[1].tsUpdate},
-					{_id: data.result[2]._id, tsUpdate: data.result[2].tsUpdate}
-				];
-			} );
-
-			t.done();
-		} )
-	},
-
-	'Find insertions into `test`': function( t ) {
-		catchAll( t );
-		var i, ids = [];
-		t.expect( 9 );
-
-		for ( i = 0; i < f1_ins.length; i += 1 ) {
-			ids.push( f1_ins[i]._id );
-		}
-
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.ok( Array.isArray( data.result ) );
-				t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
-				t.deepEqual( data.count, 3, 'Wrong count' );
-			} );
-
-			t.done();
-		} );
-	},
-	'Modify `test` document': function( t ) {
-		catchAll( t );
-		t.expect( 3 );
-
-		flexo.modify( {name: flexo_1.scheme, query: [
-			{ selector: f1_ins[0], properties: {join_id: f2_ins[0]._id} }
-		], options: {}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( data.length, 1, 'Document wasn\'t modified' );
-
-			t.done();
-		} );
-	},
-
-	'Check `test` document modification': function( t ) {
-		catchAll( t );
-		t.expect( 13 );
-
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: f1_ins[0]._id}, options: {}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.ok( Array.isArray( data.result ) );
-				t.notDeepEqual( data.result.length, 0, 'Can\'t find modified document' );
-				t.ok( data.result[0], 'Document not defined' );
-				t.ok( data.result[0]._id, 'Document has no field `_id`' );
-				t.ok( data.result[0].join_id, 'Document has no field `join_id`' );
-				t.deepEqual( data.result[0]._id, f1_ins[0]._id, 'Find returned wrong document' );
-				t.deepEqual( data.result[0].join_id, [f2_ins[0]._id], 'Document wasn\'t modified' );
-			} );
-
-			t.done();
-		} );
-	},
-
-	'Delete `test` document': function( t ) {
-		catchAll( t );
-		t.expect( 6 );
-
-		flexo.delete( {name: flexo_1.scheme, query: [ f1_ins[1] ], options: {}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data, 'No data returned' );
-			t.deepEqual( data.length, 1, 'Document wasn\'t found' );
-			t.ok( data[0], 'Document not defined' );
-			t.ok( data[0]._id, 'Document has no field `_id`' );
-			t.deepEqual( data[0]._id, f1_ins[1]._id, 'Deleted _id not equal requested _id' );
-
-			t.done();
-		} );
-	},
-
-	'Check `test` document deletion': function( t ) {
-		catchAll( t );
-		t.expect( 14 );
-
-		flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
-			t.ifError( err );
-
-			t.ok( data );
-			t.deepEqual( typeof data, 'object' );
-			t.doesNotThrow( function() {
-				t.ok( data.result );
-				t.ok( data.idFields );
-				t.ok( Array.isArray( data.result ) );
-				t.deepEqual( data.count, 2, 'Excessive documents in `test`' );
-
-				t.ok( data.result[0], 'Document not defined' );
-				t.ok( data.result[0]._id, 'Document has no field `_id`' );
-				t.ok( data.result[1], 'Document not defined' );
-				t.ok( data.result[1]._id, 'Document has no field `_id`' );
-				t.notDeepEqual( data.result[0]._id, f1_ins[1]._id, 'Document wasn\'t deleted' );
-				t.notDeepEqual( data.result[1]._id, f1_ins[1]._id, 'Document wasn\'t deleted' );
-			} );
-
-			t.done();
-		} );
+	for ( i = 0; i < f2_ins.length; i += 1 ) {
+		ids.push( f2_ins[i]._id );
 	}
+
+	flexo.find( {name: flexo_2.scheme, fields: flexo_2.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.deepEqual( data.count, 3, 'Wrong count' );
+
+			t.ok( Array.isArray( data.result ) );
+			t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
+		} );
+
+		t.done();
+	} )
+};
+
+exports['Insert documents into `test`'] = function( t ) {
+	catchAll( t );
+	t.expect( 13 );
+
+	flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, query: [
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[2]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id, f2_ins[0]._id]},
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[1]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id]},
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[0]._id, array_of_id: [f2_ins[2]._id]}
+	], options: {}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
+
+			t.ok( data.result[0]._id, 'Document has no _id' );
+			t.ok( data.result[1]._id, 'Document has no _id' );
+			t.ok( data.result[2]._id, 'Document has no _id' );
+
+			t.ok( data.result[0].tsUpdate, 'Document has no tsUpdate' );
+			t.ok( data.result[1].tsUpdate, 'Document has no tsUpdate' );
+			t.ok( data.result[2].tsUpdate, 'Document has no tsUpdate' );
+
+			f1_ins = [
+				{_id: data.result[0]._id, tsUpdate: data.result[0].tsUpdate},
+				{_id: data.result[1]._id, tsUpdate: data.result[1].tsUpdate},
+				{_id: data.result[2]._id, tsUpdate: data.result[2].tsUpdate}
+			];
+		} );
+
+		t.done();
+	} )
+};
+
+exports['Find insertions into `test`'] = function( t ) {
+	catchAll( t );
+	var i, ids = [];
+	t.expect( 9 );
+
+	for ( i = 0; i < f1_ins.length; i += 1 ) {
+		ids.push( f1_ins[i]._id );
+	}
+
+	flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: {$in: ids}}, options: {count: true}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.ok( Array.isArray( data.result ) );
+			t.deepEqual( data.result.length, 3, 'Documents aren\'t saved' );
+			t.deepEqual( data.count, 3, 'Wrong count' );
+		} );
+
+		t.done();
+	} );
+};
+
+exports['Modify `test` document'] = function( t ) {
+	catchAll( t );
+	t.expect( 3 );
+
+	flexo.modify( {name: flexo_1.scheme, query: [
+		{ selector: f1_ins[0], properties: {join_id: f2_ins[0]._id} }
+	], options: {}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( data.length, 1, 'Document wasn\'t modified' );
+
+		t.done();
+	} );
+};
+
+exports['Check `test` document modification'] = function( t ) {
+	catchAll( t );
+	t.expect( 13 );
+
+	flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {_id: f1_ins[0]._id}, options: {}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.ok( Array.isArray( data.result ) );
+			t.notDeepEqual( data.result.length, 0, 'Can\'t find modified document' );
+			t.ok( data.result[0], 'Document not defined' );
+			t.ok( data.result[0]._id, 'Document has no field `_id`' );
+			t.ok( data.result[0].join_id, 'Document has no field `join_id`' );
+			t.deepEqual( data.result[0]._id, f1_ins[0]._id, 'Find returned wrong document' );
+			t.deepEqual( data.result[0].join_id, [f2_ins[0]._id], 'Document wasn\'t modified' );
+		} );
+
+		t.done();
+	} );
+};
+
+exports['Delete `test` document'] = function( t ) {
+	catchAll( t );
+	t.expect( 6 );
+
+	flexo.delete( {name: flexo_1.scheme, query: [ f1_ins[1] ], options: {}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data, 'No data returned' );
+		t.deepEqual( data.length, 1, 'Document wasn\'t found' );
+		t.ok( data[0], 'Document not defined' );
+		t.ok( data[0]._id, 'Document has no field `_id`' );
+		t.deepEqual( data[0]._id, f1_ins[1]._id, 'Deleted _id not equal requested _id' );
+
+		t.done();
+	} );
+};
+
+exports['Check `test` document deletion'] = function( t ) {
+	catchAll( t );
+	t.expect( 14 );
+
+	flexo.find( {name: flexo_1.scheme, fields: flexo_1.fields, query: {}, options: {count: true}}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data );
+		t.deepEqual( typeof data, 'object' );
+		t.doesNotThrow( function() {
+			t.ok( data.result );
+			t.ok( data.idFields );
+			t.ok( Array.isArray( data.result ) );
+			t.deepEqual( data.count, 2, 'Excessive documents in `test`' );
+
+			t.ok( data.result[0], 'Document not defined' );
+			t.ok( data.result[0]._id, 'Document has no field `_id`' );
+			t.ok( data.result[1], 'Document not defined' );
+			t.ok( data.result[1]._id, 'Document has no field `_id`' );
+			t.notDeepEqual( data.result[0]._id, f1_ins[1]._id, 'Document wasn\'t deleted' );
+			t.notDeepEqual( data.result[1]._id, f1_ins[1]._id, 'Document wasn\'t deleted' );
+		} );
+
+		t.done();
+	} );
+};
+
+exports['Clear'] = function( t ) {
+	catchAll( t );
+	t.expect( 0 );
+
+	flexo.find( {
+		name: flexo_1.scheme,
+		fields: ['_id', 'tsUpdate'],
+		query: {}
+	}, function( err, data ) {
+		t.ifError( err );
+
+		t.ok( data.result.length );
+
+		flexo.delete( {
+			name: flexo_1.scheme,
+			query: data.result
+		}, function( err, data ) {
+			t.ifError( err );
+
+			t.ok( data.length );
+
+			flexo.find( {
+				name: flexo_2.scheme,
+				fields: ['_id', 'tsUpdate'],
+				query: {}
+			}, function( err, data ) {
+				t.ifError( err );
+
+				t.ok( data.result.length );
+
+				flexo.delete( {
+					name: flexo_2.scheme,
+					query: data.result
+				}, function( err, data ) {
+					t.ifError( err );
+
+					t.ok( data.length );
+
+					t.done();
+				} );
+			} );
+		} );
+	} );
 };
 
 
