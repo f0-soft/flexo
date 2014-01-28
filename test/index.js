@@ -338,7 +338,7 @@ exports['Check `test` document deletion'] = function( t ) {
 
 exports['Clear'] = function( t ) {
 	catchAll( t );
-	t.expect( 0 );
+	t.expect( 8 );
 
 	flexo.find( {
 		name: flexo_1.scheme,
