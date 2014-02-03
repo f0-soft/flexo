@@ -21,6 +21,7 @@ var log = function() { };
 if ( process.env.DEBUG ) { log = console.log; }
 
 var _ = require( 'underscore' );
+var async = require( 'async' );
 var Starter = require( 'f0.starter' );
 
 
@@ -48,7 +49,29 @@ var starterConfig = _.extend(
 if ( mock ) { starterConfig.rabbit = Starter.mock.rabbit; }
 var flexo, rabbit;
 
-var flexo_1 = { scheme: 'test', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'join_id', 'array_of_id', 'test_join__id', 'test_join_name', 'test_join_inn', 'test_join_comment'] };
+var flexo_1 = {
+	scheme: 'test',
+	fields: [
+		// system
+		'_id', 'tsCreate', 'tsUpdate',
+		// own
+		'name', 'inn', 'comment', 'join_id', 'array_of_id',
+		// children
+		'test_join__id', 'test_join_name', 'test_join_inn', 'test_join_comment',
+		// types
+		'tArray',
+		'tBool',
+		'tFloat',
+		'tId',
+		'tInt',
+		'tMoney',
+		'tNumeric',
+		'tObjarray',
+		'tPhone',
+		'tStr',
+		'tStrs'
+//		,'tWords'
+	] };
 var flexo_2 = { scheme: 'test_join', fields: ['_id', 'tsCreate', 'tsUpdate', 'name', 'inn', 'comment', 'array_of_id'] };
 var f1_ins, f2_ins;
 
@@ -193,9 +216,26 @@ exports['Insert documents into `test`'] = function( t ) {
 	t.expect( 13 );
 
 	flexo.insert( {name: flexo_1.scheme, fields: flexo_1.fields, query: [
-		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[2]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id, f2_ins[0]._id]},
-		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[1]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id]},
-		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[0]._id, array_of_id: [f2_ins[2]._id]}
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[2]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id, f2_ins[0]._id],
+			tArray: [1, 2, 3],
+			tBool: true,
+			tFloat: 1.23,
+			tId: 'tt123',
+			tInt: 123,
+			tMoney: 100.42,
+			tNumeric: '00123',
+			tObjarray: [
+				{t1: '0qwe', t2: '0asd'},
+				{t1: '1qwe'},
+				{t2: '2asd'}
+			],
+			tPhone: '(123)456-78-90',
+			tStr: 'qwe',
+			tStrs: ['qwe', 'asd']
+//			,tWords: 'qwe asd zxc'
+		},
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[1]._id, array_of_id: [f2_ins[2]._id, f2_ins[1]._id] },
+		{ name: rnd(), inn: rnd(), comment: rnd(), join_id: f2_ins[0]._id, array_of_id: [f2_ins[2]._id] }
 	], options: {}}, function( err, data ) {
 		t.ifError( err );
 
@@ -256,7 +296,13 @@ exports['Modify `test` document'] = function( t ) {
 	t.expect( 3 );
 
 	flexo.modify( {name: flexo_1.scheme, query: [
-		{ selector: f1_ins[0], properties: {join_id: f2_ins[0]._id} }
+		{ selector: f1_ins[0], properties: {
+			join_id: f2_ins[0]._id,
+			tObjarray: [
+				{t1: '0qwe', t2: '0asd'},
+				{t2: '2asd'}
+			]
+		} }
 	], options: {}}, function( err, data ) {
 		t.ifError( err );
 
@@ -338,46 +384,35 @@ exports['Check `test` document deletion'] = function( t ) {
 
 exports['Clear'] = function( t ) {
 	catchAll( t );
-	t.expect( 8 );
+	t.expect( 1 );
 
-	flexo.find( {
-		name: flexo_1.scheme,
-		fields: ['_id', 'tsUpdate'],
-		query: {}
-	}, function( err, data ) {
-		t.ifError( err );
+	var colls = [
+		flexo_1.scheme,
+		flexo_2.scheme
+	];
 
-		t.ok( data.result.length );
-
-		flexo.delete( {
-			name: flexo_1.scheme,
-			query: data.result
+	async.mapSeries( colls, function( name, cb ) {
+		flexo.find( {
+			name: name,
+			query: {},
+			fields: ['_id', 'tsUpdate']
 		}, function( err, data ) {
-			t.ifError( err );
+			if ( err ) { return cb( err ); }
 
-			t.ok( data.length );
+			if ( !data.result.length ) { return cb( null, 0 ); }
 
-			flexo.find( {
-				name: flexo_2.scheme,
-				fields: ['_id', 'tsUpdate'],
-				query: {}
+			return flexo.delete( {
+				name: name,
+				query: data.result
 			}, function( err, data ) {
-				t.ifError( err );
-
-				t.ok( data.result.length );
-
-				flexo.delete( {
-					name: flexo_2.scheme,
-					query: data.result
-				}, function( err, data ) {
-					t.ifError( err );
-
-					t.ok( data.length );
-
-					t.done();
-				} );
+				if ( err ) { return cb( err ); }
+				return cb( null, data.length );
 			} );
 		} );
+	}, function( err, res ) {
+		t.ifError( err );
+
+		t.done();
 	} );
 };
 

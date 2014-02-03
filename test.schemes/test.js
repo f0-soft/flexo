@@ -15,7 +15,24 @@ exports.root = {
 	inn: { type: 'str' },
 	comment: { type: 'str' },
 	join_id: { type: 'id' }, // автоматически обязательное поле из-за джойна
-	array_of_id: { type: 'id', from: 'test_join' } // может быть пустым
+	array_of_id: { type: 'id', from: 'test_join' }, // может быть пустым
+
+	// тесты типов
+	tArray: { type: 'array' },
+	tBool: { type: 'bool' },
+	tFloat: { type: 'float' },
+	tId: { type: 'id' },
+	tInt: { type: 'int' },
+	tMoney: { type: 'money' },
+	tNumeric: { type: 'numeric' },
+	tObjarray: { type: 'objarray', subtype: {
+		t1: { type: 'str' },
+		t2: { type: 'str' }
+	} },
+	tPhone: { type: 'phone' },
+	tStr: { type: 'str' },
+	tStrs: { type: 'strs' }
+//	,tWords: { type: 'words' }
 };
 
 
