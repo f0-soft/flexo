@@ -1,15 +1,14 @@
-module.exports = {
-    name: 'products',
+'use strict';
 
-    root: {
-        name: { type: 'words', title:'Название', weight: true},
-        group_id: {type: 'id', title:'Группа продукции', link:'productsGroup', from: 'prodGroup'},
-        code: {type: 'str', title:'Код'},
-        unit_id: {type:'id', title:'Единица измерения', from: 'unit'},
-        weight: {type:'str', title:'Вес'},
-        price: {type:'money', title:'Цена по умолчанию', weight: true},
-        note: {type:'str', title:'Описание'}
-    }
+exports.name = 'products';
+exports.root = {
+	name: { type: 'words', title: 'Название', weight: true },
+	group_id: { type: 'id', title: 'Группа продукции' },
+	code: { type: 'str', title: 'Код' },
+	unit_id: { type: 'id', title: 'Единица измерения', from: 'unit' },
+	weight: { type: 'str', title: 'Вес' },
+	price: { type: 'money', title: 'Цена по умолчанию', weight: true },
+	note: { type: 'str', title: 'Описание' }
 };
 
 /*

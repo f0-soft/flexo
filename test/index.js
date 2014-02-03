@@ -35,7 +35,7 @@ var starterConfig = _.extend(
 		flexo_path: __dirname + '/../test.schemes',
 		type_path: __dirname + '/../node_modules/f0.starter/scheme/types',
 		link_path: __dirname + '/../test.links',
-		view_path: __dirname + '/../test.view',
+		view_path: __dirname + '/../test.other',
 		template_path: __dirname + '/../test.tpl',
 		collection_alias: {
 			test: 'tt',

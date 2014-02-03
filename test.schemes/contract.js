@@ -1,12 +1,11 @@
-module.exports = {
-    name: 'contract',
+'use strict';
 
-    root: {
-        name: { type: 'words', title:'Название контракта', weight: true},
-        c_id: { type:'id', title:'Компания',  link: 'companyUser', from: 'company', includeWeight: ['company']},
-        date: { type: 'int', title:'Дата подпсиание контракта'},
-        note: { type:'str', title:'Примечание'}
-    }
+exports.name = 'contract';
+exports.root = {
+	name: { type: 'words', title: 'Название контракта', weight: true },
+	c_id: { type: 'id', title: 'Компания', link: 'companyUser', from: 'company', includeWeight: ['company'] },
+	date: { type: 'int', title: 'Дата подпсиание контракта' },
+	note: { type: 'str', title: 'Примечание' }
 };
 
 /*
